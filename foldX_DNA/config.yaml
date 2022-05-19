@@ -1,0 +1,11 @@
+#config file
+mutation_list: "individual_list.txt"
+input_pdb: "p53_3KZ8_DNA.pdb"
+repaired_pdb: "p53_3KZ8_DNA_Repair"
+
+#PDB input and Output directories
+pdb_dir: "../foldX_DNA"
+out_dir: "results"
+
+foldX: "/usr/local/foldx5_2022/foldx"
+number_of_runs: 5

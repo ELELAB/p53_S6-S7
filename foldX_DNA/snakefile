@@ -1,0 +1,142 @@
+# Pipeline
+# rule repair (repair PDB)
+# Output => repaired structure
+
+# rule prep
+# input => repaired structure
+# output => directories for each mutation with the repaired sturcture and a file called "individual_list.txt" in.
+
+# rule build_mutations
+# input => "individual_list.txt" in dir created in prep
+# output => "PDBlist_x_fxout" in dir created in prep
+#
+# analyze_DNA_binding
+# input => "PDBlist_x_fxout" from build mutations
+# output => "analzyze.log" dummy file created because this foldx step creates a range of files for the next part.
+#
+# collect_ddG
+# input => "analzyze.log", which is not really used
+# output => "overview.csv" in each dir created in prep
+#
+# create_csv
+# input => "overview.csv" in each dir created in prep
+# output => one collective file "ddG_overview.csv"
+
+from glob import glob
+import os
+import pandas as pd
+import numpy as np
+
+#define the configuration file and all the relevant items from it:
+configfile: 'config.yaml'
+pdb = config['input_pdb'] 
+repairpdb = config['repaired_pdb'] 
+foldX = config['foldX'] 
+n = config['number_of_runs']
+pdb_dir = config['pdb_dir'] 
+out_dir = config['out_dir'] 
+mutation_list = config['mutation_list'] 
+
+basename = os.path.splitext(config['input_pdb'])[0]
+repaired_pdb = f"{basename}_Repair.pdb"
+mutation_pdblist = f"PdbList_{basename}_Repair.fxout"
+interaction_mut_fxout = [ f"Summary_{basename}_Repair_1_{i}_AC.fxout" for i in range(n) ]
+interaction_WT_fxout = [ f"Summary_WT_{basename}_Repair_1_{i}_AC.fxout" for i in range(n) ]
+
+#convert individuals list to a mutational list
+
+with open(mutation_list, "r") as fh:
+    mutations = list(set([l.strip().rstrip(';') for l in fh.readlines()]))
+
+rule all:
+    input:
+        f"{out_dir}/ddG_overview.csv"
+
+#repair the PDB, seems to work well
+rule repair:
+    input:
+        config['input_pdb']
+    output:
+        f"{out_dir}/repair/{repaired_pdb}"
+    shell:
+        """
+        dir=$(dirname {output})
+        mkdir -p $dir
+        cp {input} $dir
+        cd $dir
+        {foldX} --command=RepairPDB --pdb={input} &> log #--repair_interface=NONE
+        """ 
+
+#preperation of directories and files in directories (a dir for each mutation 
+#containing a file called individials list with a single line and the repaired pdb).
+rule prep:
+    input:
+    output:
+        f"{out_dir}/" + "{mutation}/individual_list.txt"
+    shell:
+        """
+        echo {wildcards.mutation}\; > {output}
+        """
+
+#rule to build each mutation for the sturcture using the information from the 
+#prep rule
+rule build_mutations:
+    input:
+        ind_list = f"{out_dir}/" + "{mutation}/individual_list.txt",
+        repair_pdb = f"{out_dir}/repair/{repaired_pdb}"
+    output:
+        f"{out_dir}/" + "{mutation}/" + f"{mutation_pdblist}"  #example: PdbList_5MCTa_DNA_Repair.fxout
+    shell:
+        """
+        cd $(dirname {output})
+        cp ../../{input.repair_pdb} .
+        {foldX} --command=BuildModel --pdb=$(basename {input.repair_pdb}) --out-pdb=true --numberOfRuns={config[number_of_runs]} --mutant-file=$(basename {input.ind_list}) &> log
+        """
+#rule to analyze dna binding energy using the output from the build rule    
+rule analyze_DNA_binding:
+    input:
+        f"{out_dir}/" + "{mutation}/" + f"{mutation_pdblist}"  #example: PdbList_5MCTa_DNA_Repair.fxout
+    output:
+        [f"{out_dir}/" + "{mutation}/" + f"{fname}" for fname in interaction_mut_fxout], #is this viable? Just added due to no singular relevant file outcome
+        [f"{out_dir}/" + "{mutation}/" + f"{fname}" for fname in interaction_WT_fxout]
+    shell:
+        """
+        cd $(dirname {input})
+        {foldX} --command=AnalyseComplex --pdb-list=$(basename {input}) --complexWithDNA=true &> log.txt
+        """
+#rule to collect the ddGs calculated by the analyze_dna rule 
+rule collect_ddG:
+    input:
+        muts = [f"{out_dir}/" + "{mutation}/" + f"{fname}" for fname in interaction_mut_fxout], #is this viable? Just added due to no singular relevant file outcome
+        wts  = [f"{out_dir}/" + "{mutation}/" + f"{fname}" for fname in interaction_WT_fxout]
+
+    output: 
+        f"{out_dir}/" + "{mutation}/outcome.csv"
+    run:
+        value_list = []
+        name = wildcards.mutation
+        for mut, wt in zip(input.muts, input.wts):
+            with open(mut, 'r') as f:
+                lines = f.readlines()
+                Interaction_energy_model = float((lines[9].split('\t'))[5])
+            with open(wt, 'r') as f:
+                lines = f.readlines()
+                Interaction_energy_WT = float((lines[9].split('\t'))[5])
+            
+            diff = Interaction_energy_model - Interaction_energy_WT
+            value_list.append(diff)
+        ddg = np.mean(value_list)
+        df = pd.DataFrame({'mutation' : name, 'ddG' : ddg}, index=[0])
+        df.to_csv(output[0], index=False, header=False)
+
+rule create_csv:
+    input:
+        expand(f"{out_dir}/" + "{mutation}/outcome.csv",  mutation=mutations, allow_missing=True)
+    output:
+        f"{out_dir}/ddG_overview.csv"
+    shell:
+        """
+        echo "Mutation,Binding_energy" > {output}
+        cat {input} >> {output}
+        """
+
