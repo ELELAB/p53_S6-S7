@@ -1,0 +1,226 @@
+#!/usr/bin/env python
+
+import argparse
+import requests
+import json
+import pandas as pd
+import re
+
+description = "dummy description"
+epilog = "dummy epilog"
+
+gnomad_endpoint = "https://gnomad.broadinstitute.org/api"
+
+base_query = """query getGene($geneSymbol : String!, 
+                              $refBuild : ReferenceGenomeId!,
+                              $dataset : DatasetId!) {
+                gene(gene_symbol : $geneSymbol, reference_genome: $refBuild) {
+                    gene_id
+                    symbol
+      	            hgnc_id
+                    variants(dataset : $dataset) {
+                        variant_id
+                        reference_genome
+                        chrom
+                        pos
+                        ref
+                        alt
+                        rsids
+                        exome { 
+                            ac
+                            an 
+                        }
+                        genome {
+                            ac
+                            an
+                        }
+                        transcript_consequence {
+		            hgvs
+                            hgvsc
+                            hgvsp
+                            is_canonical
+                            major_consequence
+                            transcript_id
+                            transcript_version
+                        }
+                    }
+                }
+            }"""
+
+
+final_col_order = ['variant_id',
+                   'reference_genome',
+                   'chrom',
+                   'pos',
+                   'ref',
+                   'alt',
+                   'rsids',
+                   'transcript_id',
+                   'transcript_version',
+                   'is_canonical',
+                   'hgvs',
+                   'hgvsc',
+                   'hgvsp',
+                   'major_consequence',
+                   'wt_residue',
+                   'protein_position',
+                   'mutated_residue',
+                   'genome.ac',
+                   'genome.an',
+                   'genome_fr',
+                   'exome.ac',
+                   'exome.an',
+                   'exome_fr',
+                   'total.ac',
+                   'total.an',
+                   'total_fr']
+
+p_regexp = 'p\.([A-Z][a-z][a-z])([0-9]+)([A-Za-z?*0-9]+)'
+p_prog = re.compile(p_regexp)
+p_multi_regexp = 'p\.([A-Z][a-z][a-z])([0-9]+)_([A-Z][a-z][a-z])([0-9]+)([A-Za-z?*0-9]+)'
+p_multi_prog = re.compile(p_multi_regexp)
+
+available_genome_builds = ['GRCh37',
+                           'GRCh38']
+
+available_frequencies = ['genome',
+                         'exome',]
+
+default_build = 'GRCh37'
+
+available_gnomad_datasets = ['gnomad_r3',
+                             'gnomad_r3_controls_and_biobanks',
+                             'gnomad_r3_non_cancer',
+                             'gnomad_r3_non_neuro',
+                             'gnomad_r3_non_topmed',
+                             'gnomad_r3_non_v2',
+                             'gnomad_r2_1',
+                             'gnomad_r2_1_controls',
+                             'gnomad_r2_1_non_neuro',
+                             'gnomad_r2_1_non_cancer',
+                             'gnomad_r2_1_non_topmed',
+                             'exac']
+
+default_dataset = 'gnomad_r2_1_non_cancer'
+
+def gnomad_query(gnomad_endpoint, base_query, gene_symbol, ref_genome, dataset):
+    
+    response = requests.post(gnomad_endpoint,
+       data=json.dumps({
+                            "query": base_query,
+                            "variables": { "geneSymbol": gene_symbol,
+                                           "refBuild"  : ref_genome,
+                                           "dataset"   : dataset }
+                        }),
+       headers={"Content-Type": "application/json"})
+
+    variants = pd.json_normalize(response.json()['data']['gene']['variants'])
+
+    variants = variants.rename(columns={'transcript_consequence.hgvs':              'hgvs',
+                                        'transcript_consequence.hgvsc':             'hgvsc',
+                                        'transcript_consequence.hgvsp':             'hgvsp',
+                                        'transcript_consequence.is_canonical':      'is_canonical',
+                                        'transcript_consequence.major_consequence': 'major_consequence',
+                                        'transcript_consequence.transcript_id':     'transcript_id',
+                                        'transcript_consequence.transcript_version':'transcript_version'})
+
+    variants.is_canonical = variants.is_canonical.fillna(False)
+
+    return variants.drop(columns=['exome', 'genome'])
+
+def split_hgvsp(variants, p_prog):
+    out = []
+
+    if variants.hgvsp is None:
+        vals = [None, None, None]
+    else:
+        vals = p_multi_prog.findall(variants.hgvsp)
+
+        if vals:
+            vals = vals[0]
+            vals = ('multiple', f"{vals[1]}-{vals[3]}", vals[4])
+        else:
+            vals = p_prog.findall(variants.hgvsp)
+            if not vals:
+                vals = ('complex', 'complex', 'complex')
+            else:
+                vals = vals[0]
+
+    assert len(vals) == 3
+
+    return pd.Series(vals)
+
+ap = argparse.ArgumentParser()
+ap.add_argument("GENE_NAME",
+        type=str,
+        help="gene name")
+ap.add_argument('-b', '--genome-build',
+        dest='ref_genome',
+        type=str, 
+        choices=available_genome_builds,
+        help="reference genome build (choices: {0})",
+        default='GRCh37')
+ap.add_argument('-g', '--gnomad-dataset',
+        dest='gnomad_dataset',
+        type=str,
+        choices=available_gnomad_datasets,
+        help="gnomAD dataset of choice (default: gnomad_r2_1_non_cancer)",
+        default='gnomad_r2_1_non_cancer')
+ap.add_argument('-t', '--threshold',
+        dest='frequency_thres',
+        type=float,
+        help="Frequency filtering threshold for exome or genome frequency (range 0-1, not percentage)",
+        default=0.00001)
+ap.add_argument('-T', '--frequency-type',
+        dest='frequency_type',
+        choices=available_frequencies,
+        help="Frequency type to be considered for filtering, default exome",
+        default='exome')
+ap.add_argument('-p', '--protein-only',
+        dest='protein_only',
+        default=False,
+        action='store_true',
+        help='Filter out variants with no specified HGVSp (default: do not filter)')
+ap.add_argument('-c', '--canonical-only',
+        dest='canonical_only',
+        default=False,
+        action='store_true',
+        help='Only keep variants specified in the canonical transcript (default: keep all)')
+ap.add_argument('-o', '--output-csv',
+        dest='output',
+        type=str,
+        default='variants.csv')
+
+args = ap.parse_args()
+
+variants = gnomad_query(gnomad_endpoint,
+                        base_query,
+                        args.GENE_NAME,
+                        args.ref_genome,
+                        args.gnomad_dataset)
+
+variants['total.ac'] = variants['exome.ac'] + variants['genome.ac']
+variants['total.an'] = variants['exome.an'] + variants['genome.an']
+
+variants['exome_fr']  =  variants['exome.ac'] / variants['exome.an']
+variants['genome_fr'] = variants['genome.ac'] / variants['genome.an']
+variants['total_fr'] = variants['total.ac'] / variants['total.an']
+
+if args.frequency_type == 'exome':
+    filt_type = 'exome_fr'
+elif args.frequency_type == 'genome':
+    filt_type = 'genome_fr'
+elif args.frequency_type == 'total':
+    filt_type = 'total_fr'
+
+variants = variants[variants[filt_type] <= args.frequency_thres]
+
+variants[['wt_residue', 'protein_position', 'mutated_residue']] = variants.apply(split_hgvsp, axis=1, p_prog=p_prog)
+
+if args.protein_only:
+    variants = variants[~ variants['hgvsp'].isna()]
+
+if args.canonical_only:
+    variants = variants[variants['is_canonical']]
+
+variants[final_col_order].to_csv(args.output, index=False, na_rep='NA')
