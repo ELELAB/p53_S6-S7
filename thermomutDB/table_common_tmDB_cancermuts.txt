@@ -1,0 +1,49 @@
+ID Protein.Name Mutation PDB T pH Method Measure ddG dTm Reference
+1 6 Cellular tumor antigen p53 C242S 1TUP 283.15 7.2 Unavailable Unavailable -3.07 - PMID: 1203434
+2 7 Cellular tumor antigen p53 F134L 1TUP 283.15 7.2 Unavailable Unavailable -4.78 - PMID: 1203434
+3 8 Cellular tumor antigen p53 F270C 1TUP 283.15 7.2 Unavailable Unavailable -4.54 - PMID: 1203434
+4 9 Cellular tumor antigen p53 I195T 1TUP 283.15 7.2 Unavailable Unavailable -4.12 - PMID: 1203434
+5 10 Cellular tumor antigen p53 I232T 1TUP 283.15 7.2 Unavailable Unavailable -3.19 - PMID: 1203434
+6 11 Cellular tumor antigen p53 I255F 1TUP 283.15 7.2 Unavailable Unavailable -3.29 - PMID: 1203434
+7 12 Cellular tumor antigen p53 L145Q 1TUP 283.15 7.2 Unavailable Unavailable -2.98 - PMID: 1203434
+8 13 Cellular tumor antigen p53 M237I 1TUP 283.15 7.2 Unavailable Unavailable -3.18 - PMID: 1203434
+9 14 Cellular tumor antigen p53 P151S 1TUP 283.15 7.2 Unavailable Unavailable -4.49 - PMID: 1203434
+10 16 Cellular tumor antigen p53 R248Q 1TUP 283.15 7.2 Unavailable Unavailable -1.87 - PMID: 1203434
+11 17 Cellular tumor antigen p53 V157F 1TUP 283.15 7.2 Unavailable Unavailable -3.88 - PMID: 1203434
+12 3694 Cellular tumor antigen p53 R175H 1TUP 283.15 7.2 Urea Fluorescence -3.01 - PMID: 9405613
+13 3695 Cellular tumor antigen p53 C242S 1TUP 283.15 7.2 Urea Fluorescence -3.5 - PMID: 9405613
+14 3696 Cellular tumor antigen p53 R248Q 1TUP 283.15 7.2 Urea Fluorescence -3.07 - PMID: 9405613
+15 3697 Cellular tumor antigen p53 R249S 1TUP 283.15 7.2 Urea Fluorescence -1.87 - PMID: 9405613
+16 3698 Cellular tumor antigen p53 R273H 1TUP 283.15 7.2 Urea Fluorescence -2 - PMID: 9405613
+17 4184 Cellular tumor antigen p53 A129D 1TUP 283.15 7.2 Urea DSC, Fluorescence -0.7 - PMID: 9843948
+18 4186 Cellular tumor antigen p53 A129S 1TUP 283.15 7.2 Urea DSC, Fluorescence -0.19 - PMID: 9843948
+19 4187 Cellular tumor antigen p53 C182S 1TUP 283.15 7.2 Urea DSC, Fluorescence 0.16 - PMID: 9843948
+20 4188 Cellular tumor antigen p53 D148E 1TUP 283.15 7.2 Urea DSC, Fluorescence -0.43 - PMID: 9843948
+21 4190 Cellular tumor antigen p53 D228E 1TUP 283.15 7.2 Urea DSC, Fluorescence 0.05 - PMID: 9843948
+22 4191 Cellular tumor antigen p53 L201P 1TUP 283.15 7.2 Urea DSC, Fluorescence 0.35 - PMID: 9843948
+23 4193 Cellular tumor antigen p53 M133L 1TUP 283.15 7.2 Urea DSC, Fluorescence 0.3 - PMID: 9843948
+24 4194 Cellular tumor antigen p53 N239Y 1TUP 283.15 7.2 Urea DSC, Fluorescence 1.49 - PMID: 9843948
+25 4195 Cellular tumor antigen p53 Q104H 1TUP 283.15 7.2 Urea DSC, Fluorescence 0.24 - PMID: 9843948
+26 4197 Cellular tumor antigen p53 Q165K 1TUP 283.15 7.2 Urea DSC, Fluorescence -1.27 - PMID: 9843948
+27 4198 Cellular tumor antigen p53 Q167E 1TUP 283.15 7.2 Urea DSC, Fluorescence -0.43 - PMID: 9843948
+28 4199 Cellular tumor antigen p53 R174K 1TUP 283.15 7.2 Urea DSC, Fluorescence -0.22 - PMID: 9843948
+29 4200 Cellular tumor antigen p53 S260P 1TUP 283.15 7.2 Urea DSC, Fluorescence -0.32 - PMID: 9843948
+30 4202 Cellular tumor antigen p53 V203A 1TUP 283.15 7.2 Urea DSC, Fluorescence 0.49 - PMID: 9843948
+31 4203 Cellular tumor antigen p53 Y236F 1TUP 283.15 7.2 Urea DSC, Fluorescence 0.27 - PMID: 9843948
+32 4992 Cellular tumor antigen p53 N239Y 1TUP 283.15 7.2 Urea NMR 1.37 - PMID: 10654936
+33 4994 Cellular tumor antigen p53 G245S 1TUP 283.15 7.2 Urea NMR -1.22 - PMID: 10654936
+34 4995 Cellular tumor antigen p53 R249S 1TUP 283.15 7.2 Urea NMR -1.69 - PMID: 10654936
+35 5001 Cellular tumor antigen p53 V143A 1TUP 283.15 7.2 Urea NMR -3.34 - PMID: 10654936
+36 5002 Cellular tumor antigen p53 H168R 1TUP 283.15 7.2 Urea NMR -2.75 - PMID: 10654936
+37 6643 Cellular tumor antigen p53 R248Q 1TUP 283.15 6.8 Urea NMR, Fluorescence 0.74 - PMID: 12600206
+38 6644 Cellular tumor antigen p53 R249S 1TUP 283.15 6.8 Urea NMR, Fluorescence 0.34 - PMID: 12600206
+39 6645 Cellular tumor antigen p53 G245S 1TUP 283.15 6.8 Urea NMR, Fluorescence -0.56 - PMID: 12600206
+40 6646 Cellular tumor antigen p53 R175H 1TUP 283.15 6.8 Urea NMR, Fluorescence -0.6 - PMID: 12600206
+41 6647 Cellular tumor antigen p53 R282Q 1TUP 283.15 6.8 Urea NMR, Fluorescence -2.05 - PMID: 12600206
+42 8185 Cellular tumor antigen p53 G245S 1TUP 283.15 7.2 Urea DSC, Fluorescence -1.2 - PMID: 16754663
+43 8186 Cellular tumor antigen p53 R175H 1TUP 283.15 7.2 Urea DSC, Fluorescence -3.5 - PMID: 16754663
+44 8187 Cellular tumor antigen p53 R249S 1TUP 283.15 7.2 Urea DSC, Fluorescence -2 - PMID: 16754663
+45 8188 Cellular tumor antigen p53 R273H 1TUP 283.15 7.2 Urea DSC, Fluorescence -0.3 - PMID: 16754663
+46 8189 Cellular tumor antigen p53 R282W 1TUP 283.15 7.2 Urea DSC, Fluorescence -3.3 - PMID: 16754663
+47 8190 Cellular tumor antigen p53 V143A 1TUP 283.15 7.2 Urea DSC, Fluorescence -3.5 - PMID: 16754663
+48 8296 Cellular tumor antigen p53 Y220C 1TUP 283.15 7.2 Urea NMR -4 - PMID: 17015838
