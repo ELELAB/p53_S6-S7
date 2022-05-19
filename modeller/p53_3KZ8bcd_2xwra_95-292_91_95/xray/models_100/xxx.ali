@@ -1,0 +1,17 @@
+>P1;3KZ8_DNA_BCD
+structureX:3KZ8_DNA_BCD:95:B::D::::
+----SSVPSQKTYQGSYGFRLGFLHSGTAKSVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHERCSD---LAPPQHLIRVEGNLRVEYLDDRNTFRHSVVVPYEPPEVGSDCTTIHYNYMCNSSCMGGMNRRPILTIITLEDSSGNLLGRNSFEVRVCACPGRDRRTEEENLRKK/./..................../..................../*
+
+
+>P1;2XWRa_aligned
+structureX:2XWRa_aligned::A::::::
+WPLSSS----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------/-/--------------------/--------------------/*
+
+>P1;2XWRa_aligned_2
+structureX:2XWRa_aligned_2::A::::::
+----------------------------------------------------------------------------------------------SDG---------------------------------------------------------------------------------------------------------/-/--------------------/--------------------/*
+
+
+>P1;p53_3KZ8_DNA_BCD_2xwra_91-289
+sequence:::::::::
+WPLSSSVPSQKTYQGSYGFRLGFLHSGTAKSVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHERCSDSDGLAPPQHLIRVEGNLRVEYLDDRNTFRHSVVVPYEPPEVGSDCTTIHYNYMCNSSCMGGMNRRPILTIITLEDSSGNLLGRNSFEVRVCACPGRDRRTEEENL---/./..................../..................../*
